@@ -71,7 +71,7 @@ fill_details() {
     initialize_plan "$template_file" "$save_file"
 
     echo "Filling in details..."
-    echo "Leave blank to skip a field or press Ctrl+C to return to the menu."
+    echo "Leave blank to skip a field or type Ctrl+C to cancel and return to the menu."
 
     read -p "Enter Purpose: " purpose
     if [[ -n "$purpose" ]]; then
@@ -91,13 +91,22 @@ $objectives" "$save_file"
 $scope" "$save_file"
     fi
 
-    echo "Enter Key Contacts (type 'done' to finish):"
-    while :; do
-        read -p "Contact Name: " contact_name
-        [[ "$contact_name" == "done" ]] && break
-        read -p "Title/Role: " role
-        read -p "Contact Information: " contact_info
-        echo "- Name: $contact_name, Role: $role, Info: $contact_info" >> "$save_file"
+    echo "Enter Key Contacts"
+    local contacts=("Disaster Recovery Coordinator" "IT Security Lead" "Forensics Lead" "Legal Counsel" "Public Relations Lead")
+    read -p "How many contacts do you want to add? Minimum: ${#contacts[@]}: " num_contacts
+
+    if [[ -z "$num_contacts" || ! "$num_contacts" =~ ^[0-9]+$ || "$num_contacts" -lt "${#contacts[@]}" ]]; then
+        echo "Defaulting to ${#contacts[@]} contacts."
+        num_contacts=${#contacts[@]}
+    fi
+
+    for ((i = 0; i < num_contacts; i++)); do
+        local role="${contacts[i]:-Custom Contact $(($i + 1))}" # Use default role if available
+        read -p "Contact Name for $role: " contact_name
+        read -p "Title/Role for $role: " contact_title
+        read -p "Contact Information for $role: " contact_info
+
+        echo "- Name: $contact_name, Role: $contact_title, Info: $contact_info" >> "$save_file"
     done
 
     echo "Details saved."
@@ -200,4 +209,3 @@ while true; do
         ;;
     esac
 done
-
