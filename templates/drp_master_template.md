@@ -151,6 +151,12 @@ List all external vendors and partners critical to recovery efforts:
   - Service Provided:
   - Contact Information:
 
+### Appendix D: Escalation Path
+Include a clear escalation path with roles and contact details for each level of authority:
+- **Tier 1**: [e.g., IT Support]
+- **Tier 2**: [e.g., IT Manager]
+- **Tier 3**: [e.g., Executive Sponsor]
+
 ---
 
 ## Document Control

@@ -151,6 +151,12 @@ List tools used for detection, analysis, and recovery:
 - **Tool Name**: [e.g., Splunk, Carbon Black]
 - **Purpose**: [e.g., Log analysis, endpoint detection]
 
+### Appendix D: Regulatory Notifications
+Include requirements for compliance notifications:
+- **Timeline**: [e.g., Within 72 hours for GDPR compliance.]
+- **Contact Details**: [Regulatory body or governing authority.]
+- **Required Information**: Nature of incident, affected data, and mitigation steps.
+
 ---
 
 ## Document Control

@@ -84,6 +84,7 @@ fill_plan_interactively() {
     echo "Filling out the $plan_type interactively..."
     echo "Leave blank to skip any field."
 
+    # Common sections for both DRP and IRP
     read -p "Enter the purpose of the $plan_type: " purpose
     echo "## Purpose" > "$plan_path"
     echo "$purpose" >> "$plan_path"
@@ -102,11 +103,43 @@ fill_plan_interactively() {
     echo "Entering Key Contacts (Press Enter to skip any contact)..."
     echo "## Key Contacts and Roles" >> "$plan_path"
 
-    for role in "Disaster Recovery Coordinator" "IT Recovery Lead" "Communication Lead" "Business Process Owner"; do
+    for role in "Coordinator" "IT Lead" "Communication Lead" "Business Process Owner"; do
         read -p "Enter name for $role: " name
         read -p "Enter contact information for $role: " contact_info
         echo "- **$role**: $name, $contact_info" >> "$plan_path"
     done
+
+    # Specific sections for DRP
+    if [[ "$plan_type" == "DRP" ]]; then
+        echo "Entering Risk Assessment..."
+        echo "## Risk Assessment" >> "$plan_path"
+
+        read -p "Describe threats (e.g., natural disasters, cyberattacks): " threats
+        echo "### Threat Analysis" >> "$plan_path"
+        echo "$threats" >> "$plan_path"
+        echo "" >> "$plan_path"
+
+        read -p "Enter Recovery Time Objective (RTO) examples: " rto
+        echo "### Business Impact Analysis (BIA)" >> "$plan_path"
+        echo "**Recovery Time Objective (RTO):** $rto" >> "$plan_path"
+        echo "" >> "$plan_path"
+    fi
+
+    # Specific sections for IRP
+    if [[ "$plan_type" == "IRP" ]]; then
+        echo "Entering Incident Categories..."
+        echo "## Incident Categories" >> "$plan_path"
+
+        read -p "Describe incident categories (e.g., malware, insider threats): " categories
+        echo "### Classification of Incidents" >> "$plan_path"
+        echo "$categories" >> "$plan_path"
+        echo "" >> "$plan_path"
+
+        read -p "Enter tools/resources used (e.g., Splunk, Carbon Black): " tools
+        echo "### Tools and Resources" >> "$plan_path"
+        echo "$tools" >> "$plan_path"
+        echo "" >> "$plan_path"
+    fi
 
     echo "Details have been added to $plan_type. You can view or edit it later."
 }
