@@ -31,9 +31,9 @@ show_plan_menu() {
     echo "   $plan_type Management Menu   "
     echo "==============================="
     echo "1. Create New $plan_type"
-    echo "2. View Existing $plan_type"
-    echo "3. Delete a $plan_type"
-    echo "4. Generate Final Draft (.docx)"
+    echo "2. View/Edit Existing $plan_type"
+    echo "3. Generate Final Draft (.docx)"
+    echo "4. Delete a $plan_type"
     echo "5. Help"
     echo "6. Return to Main Menu"
     echo "==============================="
@@ -47,14 +47,22 @@ initialize_directories() {
 
 # Function to list existing plans
 list_plans() {
-    local plan_type="$1"
-    local plan_dir="$2"
+    local plan_dir="$1"
 
     if [[ -d "$plan_dir" ]]; then
-        echo "Existing $plan_type Plans:"
-        ls "$plan_dir"
+        echo "==============================="
+        echo "   Existing Plans in $plan_dir   "
+        echo "==============================="
+        local plans=("$(ls "$plan_dir" 2>/dev/null)")
+        if [[ ${#plans[@]} -gt 0 ]]; then
+            for plan in "$plan_dir"/*.md; do
+                echo "$(basename "$plan" .md)"
+            done
+        else
+            echo "No plans found."
+        fi
     else
-        echo "No $plan_type plans found."
+        echo "No plans directory found."
     fi
 }
 
@@ -77,11 +85,11 @@ create_plan() {
 }
 
 # Function to view or edit a plan
-view_plan() {
-    local plan_type="$1"
-    local plan_dir="$2"
+view_or_edit_plan() {
+    local plan_dir="$1"
+    local plan_type="$2"
 
-    list_plans "$plan_type" "$plan_dir"
+    list_plans "$plan_dir"
     read -p "Enter the name of the $plan_type to view/edit: " plan_name
     local plan_file="$plan_dir/$plan_name.md"
 
@@ -94,10 +102,10 @@ view_plan() {
 
 # Function to delete a plan
 delete_plan() {
-    local plan_type="$1"
-    local plan_dir="$2"
+    local plan_dir="$1"
+    local plan_type="$2"
 
-    list_plans "$plan_type" "$plan_dir"
+    list_plans "$plan_dir"
     read -p "Enter the name of the $plan_type to delete: " plan_name
     local plan_file="$plan_dir/$plan_name.md"
 
@@ -111,10 +119,10 @@ delete_plan() {
 
 # Function to generate a final draft in .docx format
 generate_docx() {
-    local plan_type="$1"
-    local plan_dir="$2"
+    local plan_dir="$1"
+    local plan_type="$2"
 
-    list_plans "$plan_type" "$plan_dir"
+    list_plans "$plan_dir"
     read -p "Enter the name of the $plan_type to generate (.docx): " plan_name
     local save_file="$plan_dir/$plan_name.md"
     local docx_file="$plan_dir/$plan_name.docx"
@@ -126,6 +134,34 @@ generate_docx() {
     else
         echo "$plan_type '$plan_name' not found."
     fi
+}
+
+# Function to provide help
+show_help() {
+    local topic="$1"
+    clear
+    echo "==============================="
+    echo "   Help - $topic   "
+    echo "==============================="
+    case "$topic" in
+        "Main Menu")
+            echo "Choose an option to manage Disaster Recovery Plans (DRPs) or Incident Response Plans (IRPs)."
+            echo "You can create, view, edit, delete, or generate final drafts for plans."
+            ;;
+        "DRP")
+            echo "Disaster Recovery Plans focus on restoring critical operations after a disruption."
+            echo "Use this section to create or manage DRPs."
+            ;;
+        "IRP")
+            echo "Incident Response Plans focus on identifying and mitigating cybersecurity incidents."
+            echo "Use this section to create or manage IRPs."
+            ;;
+        *)
+            echo "No additional help available."
+            ;;
+    esac
+    echo
+    read -p "Press Enter to return to the menu..."
 }
 
 # Initialize directories
@@ -140,9 +176,9 @@ while true; do
             show_plan_menu "Disaster Recovery Plan (DRP)"
             case $plan_choice in
             1) create_plan "$DRP_TEMPLATE_FILE" "$DRP_OUTPUT_DIR" "DRP" ;;
-            2) view_plan "DRP" "$DRP_OUTPUT_DIR" ;;
-            3) delete_plan "DRP" "$DRP_OUTPUT_DIR" ;;
-            4) generate_docx "DRP" "$DRP_OUTPUT_DIR" ;;
+            2) view_or_edit_plan "$DRP_OUTPUT_DIR" "DRP" ;;
+            3) generate_docx "$DRP_OUTPUT_DIR" "DRP" ;;
+            4) delete_plan "$DRP_OUTPUT_DIR" "DRP" ;;
             5) show_help "DRP" ;;
             6) break ;;
             *) echo "Invalid option. Try again." ;;
@@ -154,9 +190,9 @@ while true; do
             show_plan_menu "Incident Response Plan (IRP)"
             case $plan_choice in
             1) create_plan "$IRP_TEMPLATE_FILE" "$IRP_OUTPUT_DIR" "IRP" ;;
-            2) view_plan "IRP" "$IRP_OUTPUT_DIR" ;;
-            3) delete_plan "IRP" "$IRP_OUTPUT_DIR" ;;
-            4) generate_docx "IRP" "$IRP_OUTPUT_DIR" ;;
+            2) view_or_edit_plan "$IRP_OUTPUT_DIR" "IRP" ;;
+            3) generate_docx "$IRP_OUTPUT_DIR" "IRP" ;;
+            4) delete_plan "$IRP_OUTPUT_DIR" "IRP" ;;
             5) show_help "IRP" ;;
             6) break ;;
             *) echo "Invalid option. Try again." ;;
