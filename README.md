@@ -1,88 +1,121 @@
-# DR/IR Generation
+# Policy Generation Scripts
 
-This repository, **dr_ir_generation**, contains a versatile **policy_generator.sh** script designed to streamline the creation, customization, and maintenance of two critical organizational documents:
+This repository contains two powerful Bash scripts for managing Disaster Recovery Plans (DRP) and Incident Response Plans (IRP). These scripts align with **NIST 800-53**, **FISMA**, and **FedRAMP** standards, ensuring compliance and usability across organizations of all sizes.
 
-- **Disaster Recovery Plan (DRP)**
-- **Incident Response Plan (IRP)**
+## Directory Structure
 
-The script provides a user-friendly, menu-driven interface for building plans aligned with **NIST 800-53**, **FISMA**, and **FedRAMP** standards. It is tailored for organizations of any size, ensuring compliance and industry best practices.
-
-## Features
-- **Template-Based Generation**: Uses predefined templates stored in the `templates` folder.
-- **Menu-Driven Input**: Guides users through entering required information for DRP and IRP.
-- **Progress Saving**: Saves user inputs for later continuation.
-- **Final Output in .docx Format**: Generates professional `.docx` documents using `pandoc`.
-- **Company Logo Integration**: Allows embedding a logo into the plans.
-- **Organized Output Structure**: Saves files to specific `drp` and `irp` folders for better organization.
-
-## Prerequisites
-Ensure the following tools are installed on your system:
-1. **Bash** (Default shell for most UNIX-based systems)
-2. **pandoc**:
-   ```bash
-   brew install pandoc  # macOS
-   sudo apt-get install pandoc  # Ubuntu/Debian
-   ```
-3. **Templates**:
-   - `templates/drp_master_template.md`
-   - `templates/irp_master_template.md`
-
-   These templates are included in this repository.
-
-## Folder Structure
 ```
 .
-├── templates
-│   ├── drp_master_template.md
-│   ├── irp_master_template.md
-├── drp
-│   ├── drp_progress.txt
-│   ├── disaster_recovery_program.docx
-├── irp
-│   ├── irp_progress.txt
-│   ├── incident_response_plan.docx
-└── policy_generator.sh
+├── LICENSE
+├── README.md
+├── interactive_policy.sh
+├── outputs
+│   ├── drp
+│   │   └── drp_test1.md
+│   └── irp
+├── policy_generator.sh
+└── templates
+    ├── drp_master_template.md
+    └── irp_master_template.md
+
+5 directories, 7 files
 ```
 
-## Usage
-1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/yourusername/dr_ir_generation.git
-   cd dr_ir_generation
-   ```
+## Scripts Overview
 
-2. **Make the Script Executable**:
-   ```bash
-   chmod +x policy_generator.sh
-   ```
+### 1. `interactive_policy.sh`
+An interactive script that guides users through creating and customizing DRP and IRP documents directly in the terminal.
 
-3. **Run the Script**:
-   ```bash
-   ./policy_generator.sh
-   ```
+#### Features
+- **Interactive Data Entry**: Users are prompted to provide details for each section of the plan.
+- **Plan Management**:
+  - Create new plans.
+  - View and edit existing plans.
+  - Delete plans by name.
+- **User-Friendly Prompts**: Includes examples and help for each input field.
+- **Dynamic Output**: Saves progress to `outputs/drp` or `outputs/irp`.
 
-4. **Follow the Menu**:
-   - Select **Disaster Recovery Plan (DRP)** or **Incident Response Plan (IRP)**.
-   - Enter details, review saved progress, generate drafts, or add a company logo.
+#### Usage
+1. Run the script: `./interactive_policy.sh`
+2. Choose to work on DRP or IRP.
+3. Follow prompts to create, view/edit, or delete plans.
 
-5. **Generated Outputs**:
-   - DRP-related files are saved in the `drp` folder.
-   - IRP-related files are saved in the `irp` folder.
+---
 
-## Customization
-- Modify the templates in the `templates` folder to suit your organization’s specific needs.
-- Add additional sections or refine existing ones to reflect specific compliance requirements or organizational policies.
+### 2. `policy_generator.sh`
+A batch script for generating DRP and IRP documents from master templates.
 
-## Contributing
-Contributions are welcome! To contribute:
+#### Features
+- **Template-Based Generation**: Uses `templates/drp_master_template.md` and `templates/irp_master_template.md` as baselines.
+- **Batch Customization**: Automatically replaces placeholders in the templates with user-provided data.
+- **Plan Management**:
+  - Generate new plans.
+  - List existing plans.
+  - Delete plans by name.
+
+#### Usage
+1. Run the script: `./policy_generator.sh`
+2. Choose to generate or manage DRPs or IRPs.
+3. Follow the menu to create or delete plans.
+
+---
+
+## Templates
+### DRP Template (`templates/drp_master_template.md`)
+- Comprehensive structure for disaster recovery planning.
+- Includes sections for:
+  - Purpose
+  - Objectives
+  - Scope
+  - Risk Assessment
+  - Recovery Strategies
+  - Testing and Maintenance
+  - Appendices
+
+### IRP Template (`templates/irp_master_template.md`)
+- Detailed framework for incident response management.
+- Covers:
+  - Incident Categories
+  - Incident Response Phases
+  - Communication Plan
+  - Testing and Maintenance
+  - Appendices
+
+---
+
+## Outputs
+Generated plans are stored in the `outputs` directory:
+
+- **DRPs**: Saved in `outputs/drp`
+- **IRPs**: Saved in `outputs/irp`
+
+---
+
+## Prerequisites
+- **Bash Shell**: Ensure you are using a system with Bash installed.
+- **Pandoc**: Required for converting Markdown to `.docx` (if extended functionality is added).
+
+Install Pandoc (if needed):
+```bash
+brew install pandoc  # For macOS
+sudo apt install pandoc  # For Ubuntu/Debian
+```
+
+---
+
+## How to Contribute
 1. Fork the repository.
-2. Create a feature branch.
-3. Commit your changes.
-4. Open a pull request.
+2. Create a new branch: `git checkout -b feature-branch`
+3. Commit changes: `git commit -m 'Add new feature'`
+4. Push to the branch: `git push origin feature-branch`
+5. Open a pull request.
+
+---
 
 ## License
 This project is licensed under the MIT License. See the `LICENSE` file for details.
 
 ---
 
-Feel free to reach out with questions, issues, or suggestions to improve this project!
+## Feedback and Support
+If you have any issues or suggestions, please open an issue in the repository or contact us directly.
