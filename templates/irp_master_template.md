@@ -1,125 +1,190 @@
-# Incident Response Plan (IRP)
+#!/bin/bash
 
-## Purpose
-The purpose of this Incident Response Plan (IRP) is to provide a structured approach for detecting, responding to, and recovering from cybersecurity incidents. This plan aligns with **NIST 800-53**, **FISMA**, and **FedRAMP** standards to ensure compliance and best practices in incident management.
+# Directories for templates and outputs
+TEMPLATE_DIR="templates"
+DRP_OUTPUT_DIR="outputs/drp"
+IRP_OUTPUT_DIR="outputs/irp"
 
-## Objectives
-- Minimize the impact of incidents on organizational operations.
-- Protect sensitive data and systems from unauthorized access or damage.
-- Restore normal operations as quickly as possible.
-- Comply with regulatory and legal requirements.
-- Improve organizational resilience through post-incident learning.
+# Files for templates
+DRP_TEMPLATE_FILE="$TEMPLATE_DIR/drp_master_template.md"
+IRP_TEMPLATE_FILE="$TEMPLATE_DIR/irp_master_template.md"
 
-## Scope
-This IRP applies to all systems, networks, applications, and personnel within the organization. It includes incidents affecting:
-- On-premises and cloud environments.
-- Internal and external stakeholders.
-- Physical and digital assets.
+# Function to display the main menu
+show_menu() {
+    clear
+    echo "==============================="
+    echo "   Management Program Script   "
+    echo "==============================="
+    echo "1. Manage Disaster Recovery Plans (DRPs)"
+    echo "2. Manage Incident Response Plans (IRPs)"
+    echo "3. Help"
+    echo "4. Exit"
+    echo "==============================="
+    read -p "Choose an option [1-4]: " main_choice
+}
 
-## Key Contacts
-- **Incident Response Coordinator**:
-  - Name:
-  - Title:
-  - Contact Information:
-- **IT Security Lead**:
-  - Name:
-  - Title:
-  - Contact Information:
-- **Forensics Lead**:
-  - Name:
-  - Title:
-  - Contact Information:
-- **Legal Counsel**:
-  - Name:
-  - Title:
-  - Contact Information:
-- **Public Relations Lead**:
-  - Name:
-  - Title:
-  - Contact Information:
+# Function to display the sub-menu for managing plans
+show_plan_menu() {
+    local plan_type="$1"
+    clear
+    echo "==============================="
+    echo "   $plan_type Management Menu   "
+    echo "==============================="
+    echo "1. Create New $plan_type"
+    echo "2. List Existing $plan_type"
+    echo "3. View/Edit a $plan_type"
+    echo "4. Delete a $plan_type"
+    echo "5. Generate Final Draft (.docx)"
+    echo "6. Help"
+    echo "7. Return to Main Menu"
+    echo "==============================="
+    read -p "Choose an option [1-7]: " plan_choice
+}
 
-## Incident Categories
-Define categories of incidents and provide examples:
-1. **Unauthorized Access**:
-   - Example: Compromised user accounts, unauthorized login attempts.
-2. **Malware/Ransomware**:
-   - Example: Detected ransomware infections, malicious software activity.
-3. **Denial of Service (DoS/DDoS)**:
-   - Example: Overwhelmed network traffic leading to service outages.
-4. **Data Breach**:
-   - Example: Exfiltration of sensitive data.
-5. **Insider Threats**:
-   - Example: Malicious or unintentional insider actions compromising systems or data.
+# Function to initialize directories and templates
+initialize_directories() {
+    mkdir -p "$TEMPLATE_DIR" "$DRP_OUTPUT_DIR" "$IRP_OUTPUT_DIR"
+}
 
-## Incident Response Phases
-### 1. Preparation
-- Establish an incident response team (IRT) and define roles and responsibilities.
-- Conduct regular security training and awareness programs.
-- Maintain up-to-date documentation of systems and applications.
-- Implement and monitor security controls.
+# Function to list existing plans
+list_plans() {
+    local plan_type="$1"
+    local plan_dir="$2"
 
-### 2. Detection and Analysis
-- Define methods for identifying incidents (e.g., log monitoring, intrusion detection systems).
-- Document incident indicators (e.g., anomalous activity, alerts).
-- Perform initial triage to classify the incident's severity and scope.
-- Escalate incidents as necessary based on predefined criteria.
+    if [[ -d "$plan_dir" ]]; then
+        echo "==============================="
+        echo "   Existing $plan_type Plans   "
+        echo "==============================="
+        local plans=("$(ls "$plan_dir" 2>/dev/null)")
+        if [[ ${#plans[@]} -gt 0 ]]; then
+            for plan in "$plan_dir"/*.md; do
+                echo "$(basename "$plan" .md)"
+            done
+        else
+            echo "No $plan_type plans found."
+        fi
+    else
+        echo "No $plan_type plans directory found."
+    fi
+    echo
+    read -p "Press Enter to return to the menu..."
+}
 
-### 3. Containment
-- Short-Term Containment:
-  - Isolate affected systems to prevent further damage.
-- Long-Term Containment:
-  - Apply patches, updates, or mitigations to address vulnerabilities.
+# Function to create a new plan
+create_plan() {
+    local template_file="$1"
+    local plan_dir="$2"
+    local plan_type="$3"
 
-### 4. Eradication
-- Remove malicious files, software, or actors from the environment.
-- Identify root causes and ensure they are addressed.
+    read -p "Enter a unique name for the new $plan_type (e.g., 'DRP_ProjectX'): " plan_name
+    local save_file="$plan_dir/$plan_name.md"
 
-### 5. Recovery
-- Restore affected systems and services to normal operations.
-- Validate the integrity of restored systems.
-- Monitor systems closely for any signs of recurring issues.
+    if [[ -f "$save_file" ]]; then
+        echo "A plan with this name already exists. Choose another name."
+        return
+    fi
 
-### 6. Lessons Learned
-- Conduct a post-incident review within 30 days of incident resolution.
-- Document findings, including:
-  - What went well.
-  - What could be improved.
-  - Actionable recommendations.
+    cp "$template_file" "$save_file"
+    echo "New $plan_type created: $plan_name"
+}
 
-## Communication Plan
-### Internal Communication
-- Notify key stakeholders, including management, IT, and legal teams.
-- Provide regular updates on incident status.
+# Function to view or edit a plan
+view_plan() {
+    local plan_type="$1"
+    local plan_dir="$2"
 
-### External Communication
-- Notify affected parties (e.g., customers, partners) as required.
-- Engage public relations and legal counsel for external messaging.
-- Comply with regulatory notification requirements.
+    list_plans "$plan_type" "$plan_dir"
+    read -p "Enter the name of the $plan_type to view/edit: " plan_name
+    local plan_file="$plan_dir/$plan_name.md"
 
-## Testing and Maintenance
-### Testing Schedule
-- Conduct regular incident response drills (e.g., tabletop exercises) to validate readiness.
-- Perform annual reviews of the IRP.
+    if [[ -f "$plan_file" ]]; then
+        nano "$plan_file"
+    else
+        echo "$plan_type '$plan_name' not found."
+    fi
+}
 
-### Plan Updates
-- Update the IRP following major incidents, organizational changes, or new regulatory requirements.
+# Function to delete a plan
+delete_plan() {
+    local plan_type="$1"
+    local plan_dir="$2"
 
-## Appendices
-### Appendix A: Glossary of Terms
-Define key terms and acronyms used in this document (e.g., IRT, DoS, DDoS, IRP).
+    list_plans "$plan_type" "$plan_dir"
+    read -p "Enter the name of the $plan_type to delete: " plan_name
+    local plan_file="$plan_dir/$plan_name.md"
 
-### Appendix B: Incident Log Template
-Provide a template for tracking incident details:
-- Incident ID:
-- Date/Time Detected:
-- Description:
-- Affected Systems:
-- Actions Taken:
-- Status:
+    if [[ -f "$plan_file" ]]; then
+        rm "$plan_file"
+        echo "$plan_type '$plan_name' deleted."
+    else
+        echo "$plan_type '$plan_name' not found."
+    fi
+}
 
-### Appendix C: Tools and Resources
-List tools and resources used for incident detection, analysis, and response (e.g., SIEM, EDR, forensic tools).
+# Function to generate a final draft in .docx format
+generate_docx() {
+    local plan_type="$1"
+    local plan_dir="$2"
 
----
+    list_plans "$plan_type" "$plan_dir"
+    read -p "Enter the name of the $plan_type to generate (.docx): " plan_name
+    local save_file="$plan_dir/$plan_name.md"
+    local docx_file="$plan_dir/$plan_name.docx"
 
-This document template ensures compliance with industry standards and provides a scalable framework for managing incidents effectively. Tailor each section to your organization’s specific needs.
+    if [[ -f "$save_file" ]]; then
+        echo "Generating final draft for $plan_name in .docx format..."
+        pandoc "$save_file" -o "$docx_file" --standalone
+        echo "Draft saved as $docx_file."
+    else
+        echo "$plan_type '$plan_name' not found."
+    fi
+}
+
+# Initialize directories
+initialize_directories
+
+# Main program loop
+while true; do
+    show_menu
+    case $main_choice in
+    1)
+        while true; do
+            show_plan_menu "Disaster Recovery Plan (DRP)"
+            case $plan_choice in
+            1) create_plan "$DRP_TEMPLATE_FILE" "$DRP_OUTPUT_DIR" "DRP" ;;
+            2) list_plans "DRP" "$DRP_OUTPUT_DIR" ;;
+            3) view_plan "DRP" "$DRP_OUTPUT_DIR" ;;
+            4) delete_plan "DRP" "$DRP_OUTPUT_DIR" ;;
+            5) generate_docx "DRP" "$DRP_OUTPUT_DIR" ;;
+            6) show_help "DRP" ;;
+            7) break ;;
+            *) echo "Invalid option. Try again." ;;
+            esac
+        done
+        ;;
+    2)
+        while true; do
+            show_plan_menu "Incident Response Plan (IRP)"
+            case $plan_choice in
+            1) create_plan "$IRP_TEMPLATE_FILE" "$IRP_OUTPUT_DIR" "IRP" ;;
+            2) list_plans "IRP" "$IRP_OUTPUT_DIR" ;;
+            3) view_plan "IRP" "$IRP_OUTPUT_DIR" ;;
+            4) delete_plan "IRP" "$IRP_OUTPUT_DIR" ;;
+            5) generate_docx "IRP" "$IRP_OUTPUT_DIR" ;;
+            6) show_help "IRP" ;;
+            7) break ;;
+            *) echo "Invalid option. Try again." ;;
+            esac
+        done
+        ;;
+    3)
+        show_help "Main Menu"
+        ;;
+    4)
+        echo "Exiting the program. Goodbye!"
+        break
+        ;;
+    *)
+        echo "Invalid option. Try again." ;;
+    esac
+done

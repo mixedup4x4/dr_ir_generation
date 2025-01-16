@@ -2,18 +2,12 @@
 
 # Directories for templates and outputs
 TEMPLATE_DIR="templates"
-DRP_OUTPUT_DIR="drp"
-IRP_OUTPUT_DIR="irp"
+DRP_OUTPUT_DIR="outputs/drp"
+IRP_OUTPUT_DIR="outputs/irp"
 
 # Files for templates
 DRP_TEMPLATE_FILE="$TEMPLATE_DIR/drp_master_template.md"
 IRP_TEMPLATE_FILE="$TEMPLATE_DIR/irp_master_template.md"
-
-# Files for progress and final outputs
-DRP_SAVE_FILE="$DRP_OUTPUT_DIR/drp_progress.txt"
-IRP_SAVE_FILE="$IRP_OUTPUT_DIR/irp_progress.txt"
-DRP_DOCX_FILE="$DRP_OUTPUT_DIR/disaster_recovery_program.docx"
-IRP_DOCX_FILE="$IRP_OUTPUT_DIR/incident_response_plan.docx"
 
 # Function to display the main menu
 show_menu() {
@@ -21,27 +15,29 @@ show_menu() {
     echo "==============================="
     echo "   Management Program Script   "
     echo "==============================="
-    echo "1. Work on Disaster Recovery Plan (DRP)"
-    echo "2. Work on Incident Response Plan (IRP)"
-    echo "3. Exit"
+    echo "1. Manage Disaster Recovery Plans (DRPs)"
+    echo "2. Manage Incident Response Plans (IRPs)"
+    echo "3. Help"
+    echo "4. Exit"
     echo "==============================="
-    read -p "Choose an option [1-3]: " main_choice
+    read -p "Choose an option [1-4]: " main_choice
 }
 
-# Function to display the sub-menu for a selected plan
+# Function to display the sub-menu for managing plans
 show_plan_menu() {
     local plan_type="$1"
     clear
     echo "==============================="
     echo "   $plan_type Management Menu   "
     echo "==============================="
-    echo "1. Fill in $plan_type Details"
-    echo "2. Review Saved Progress"
-    echo "3. Generate Final Draft (.docx)"
-    echo "4. Add Company Logo"
-    echo "5. Return to Main Menu"
+    echo "1. Create New $plan_type"
+    echo "2. View Existing $plan_type"
+    echo "3. Delete a $plan_type"
+    echo "4. Generate Final Draft (.docx)"
+    echo "5. Help"
+    echo "6. Return to Main Menu"
     echo "==============================="
-    read -p "Choose an option [1-5]: " plan_choice
+    read -p "Choose an option [1-6]: " plan_choice
 }
 
 # Function to initialize directories and templates
@@ -49,121 +45,87 @@ initialize_directories() {
     mkdir -p "$TEMPLATE_DIR" "$DRP_OUTPUT_DIR" "$IRP_OUTPUT_DIR"
 }
 
-# Function to initialize a plan with its master template
-initialize_plan() {
-    local template_file="$1"
-    local save_file="$2"
+# Function to list existing plans
+list_plans() {
+    local plan_type="$1"
+    local plan_dir="$2"
 
-    if [[ ! -f "$save_file" ]]; then
-        echo "Initializing from master template..."
-        cp "$template_file" "$save_file"
-        echo "Template loaded into $save_file."
+    if [[ -d "$plan_dir" ]]; then
+        echo "Existing $plan_type Plans:"
+        ls "$plan_dir"
     else
-        echo "A saved plan already exists. Continuing with existing progress."
+        echo "No $plan_type plans found."
     fi
 }
 
-# Function to fill in details for a plan
-fill_details() {
+# Function to create a new plan
+create_plan() {
     local template_file="$1"
-    local save_file="$2"
+    local plan_dir="$2"
+    local plan_type="$3"
 
-    initialize_plan "$template_file" "$save_file"
-
-    echo "Filling in details..."
-    echo "Leave blank to skip a field or type Ctrl+C to cancel and return to the menu."
-
-    read -p "Enter Purpose: " purpose
-    if [[ -n "$purpose" ]]; then
-        sed -i '' "/## Purpose/a\\
-$purpose" "$save_file"
-    fi
-
-    read -p "Enter Objectives (comma-separated): " objectives
-    if [[ -n "$objectives" ]]; then
-        sed -i '' "/## Objectives/a\\
-$objectives" "$save_file"
-    fi
-
-    read -p "Enter Scope: " scope
-    if [[ -n "$scope" ]]; then
-        sed -i '' "/## Scope/a\\
-$scope" "$save_file"
-    fi
-
-    echo "Enter Key Contacts"
-    local contacts=("Disaster Recovery Coordinator" "IT Security Lead" "Forensics Lead" "Legal Counsel" "Public Relations Lead")
-    read -p "How many contacts do you want to add? Minimum: ${#contacts[@]}: " num_contacts
-
-    if [[ -z "$num_contacts" || ! "$num_contacts" =~ ^[0-9]+$ || "$num_contacts" -lt "${#contacts[@]}" ]]; then
-        echo "Defaulting to ${#contacts[@]} contacts."
-        num_contacts=${#contacts[@]}
-    fi
-
-    for ((i = 0; i < num_contacts; i++)); do
-        local role="${contacts[i]:-Custom Contact $(($i + 1))}" # Use default role if available
-        read -p "Contact Name for $role: " contact_name
-        read -p "Title/Role for $role: " contact_title
-        read -p "Contact Information for $role: " contact_info
-
-        echo "- Name: $contact_name, Role: $contact_title, Info: $contact_info" >> "$save_file"
-    done
-
-    echo "Details saved."
-    sleep 2
-}
-
-# Function to review saved progress for a plan
-review_progress() {
-    local save_file="$1"
+    read -p "Enter a unique name for the new $plan_type (e.g., 'DRP_ProjectX'): " plan_name
+    local save_file="$plan_dir/$plan_name.md"
 
     if [[ -f "$save_file" ]]; then
-        echo "==============================="
-        echo "       Saved Progress          "
-        echo "==============================="
-        cat "$save_file"
-    else
-        echo "No progress saved yet."
+        echo "A plan with this name already exists. Choose another name."
+        return
     fi
-    echo
-    read -p "Press Enter to return to the menu..."
+
+    cp "$template_file" "$save_file"
+    echo "New $plan_type created: $plan_name"
 }
 
-# Function to generate the final draft in .docx format
+# Function to view or edit a plan
+view_plan() {
+    local plan_type="$1"
+    local plan_dir="$2"
+
+    list_plans "$plan_type" "$plan_dir"
+    read -p "Enter the name of the $plan_type to view/edit: " plan_name
+    local plan_file="$plan_dir/$plan_name.md"
+
+    if [[ -f "$plan_file" ]]; then
+        nano "$plan_file"
+    else
+        echo "$plan_type '$plan_name' not found."
+    fi
+}
+
+# Function to delete a plan
+delete_plan() {
+    local plan_type="$1"
+    local plan_dir="$2"
+
+    list_plans "$plan_type" "$plan_dir"
+    read -p "Enter the name of the $plan_type to delete: " plan_name
+    local plan_file="$plan_dir/$plan_name.md"
+
+    if [[ -f "$plan_file" ]]; then
+        rm "$plan_file"
+        echo "$plan_type '$plan_name' deleted."
+    else
+        echo "$plan_type '$plan_name' not found."
+    fi
+}
+
+# Function to generate a final draft in .docx format
 generate_docx() {
-    local save_file="$1"
-    local docx_file="$2"
+    local plan_type="$1"
+    local plan_dir="$2"
+
+    list_plans "$plan_type" "$plan_dir"
+    read -p "Enter the name of the $plan_type to generate (.docx): " plan_name
+    local save_file="$plan_dir/$plan_name.md"
+    local docx_file="$plan_dir/$plan_name.docx"
 
     if [[ -f "$save_file" ]]; then
-        echo "Generating final draft in .docx format..."
-        {
-            echo "# Final Plan"
-            echo
-            cat "$save_file"
-        } > "temp.md"
-
-        pandoc temp.md -o "$docx_file" --standalone
-        rm temp.md
-
+        echo "Generating final draft for $plan_name in .docx format..."
+        pandoc "$save_file" -o "$docx_file" --standalone
         echo "Draft saved as $docx_file."
     else
-        echo "No data available to generate the draft."
+        echo "$plan_type '$plan_name' not found."
     fi
-    sleep 2
-}
-
-# Function to add a company logo
-add_logo() {
-    local save_file="$1"
-
-    read -p "Enter the path to the company logo file: " logo_path
-    if [[ -f "$logo_path" ]]; then
-        echo "![Company Logo]($logo_path)" >> "$save_file"
-        echo "Logo added to saved progress."
-    else
-        echo "Invalid file path. Logo not added."
-    fi
-    sleep 2
 }
 
 # Initialize directories
@@ -177,11 +139,12 @@ while true; do
         while true; do
             show_plan_menu "Disaster Recovery Plan (DRP)"
             case $plan_choice in
-            1) fill_details "$DRP_TEMPLATE_FILE" "$DRP_SAVE_FILE" ;;
-            2) review_progress "$DRP_SAVE_FILE" ;;
-            3) generate_docx "$DRP_SAVE_FILE" "$DRP_DOCX_FILE" ;;
-            4) add_logo "$DRP_SAVE_FILE" ;;
-            5) break ;;
+            1) create_plan "$DRP_TEMPLATE_FILE" "$DRP_OUTPUT_DIR" "DRP" ;;
+            2) view_plan "DRP" "$DRP_OUTPUT_DIR" ;;
+            3) delete_plan "DRP" "$DRP_OUTPUT_DIR" ;;
+            4) generate_docx "DRP" "$DRP_OUTPUT_DIR" ;;
+            5) show_help "DRP" ;;
+            6) break ;;
             *) echo "Invalid option. Try again." ;;
             esac
         done
@@ -190,22 +153,24 @@ while true; do
         while true; do
             show_plan_menu "Incident Response Plan (IRP)"
             case $plan_choice in
-            1) fill_details "$IRP_TEMPLATE_FILE" "$IRP_SAVE_FILE" ;;
-            2) review_progress "$IRP_SAVE_FILE" ;;
-            3) generate_docx "$IRP_SAVE_FILE" "$IRP_DOCX_FILE" ;;
-            4) add_logo "$IRP_SAVE_FILE" ;;
-            5) break ;;
+            1) create_plan "$IRP_TEMPLATE_FILE" "$IRP_OUTPUT_DIR" "IRP" ;;
+            2) view_plan "IRP" "$IRP_OUTPUT_DIR" ;;
+            3) delete_plan "IRP" "$IRP_OUTPUT_DIR" ;;
+            4) generate_docx "IRP" "$IRP_OUTPUT_DIR" ;;
+            5) show_help "IRP" ;;
+            6) break ;;
             *) echo "Invalid option. Try again." ;;
             esac
         done
         ;;
     3)
+        show_help "Main Menu"
+        ;;
+    4)
         echo "Exiting the program. Goodbye!"
         break
         ;;
     *)
-        echo "Invalid option. Try again."
-        sleep 2
-        ;;
+        echo "Invalid option. Try again." ;;
     esac
 done
