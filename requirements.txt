@@ -1,0 +1,10 @@
+# Core dependencies
+SQLAlchemy            # Database ORM
+bcrypt               # Secure password hashing
+python-dotenv        # Environment variable management
+rich                # Pretty CLI output
+typer               # CLI framework
+pydantic            # Data validation
+
+# Optional for exporting plans
+pandoc              # Required for DOCX/PDF conversion (install separately)
