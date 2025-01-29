@@ -1,3 +1,17 @@
 drp/
 irp/
 outputs/
+# Virtual Environment
+venv/
+
+# Database Files
+*.db
+
+# Compiled Python Files
+__pycache__/
+*.pyc
+
+# Outputs & Logs
+outputs/
+logs/
+

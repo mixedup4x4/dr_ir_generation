@@ -1,121 +1,156 @@
-# Policy Generation Scripts
+# DR/IR Plan Generator
 
-This repository contains two powerful Bash scripts for managing Disaster Recovery Plans (DRP) and Incident Response Plans (IRP). These scripts align with **NIST 800-53**, **FISMA**, and **FedRAMP** standards, ensuring compliance and usability across organizations of all sizes.
+## 📌 Overview
+This project automates the generation, management, and versioning of **Disaster Recovery Plans (DRP)** and **Incident Response Plans (IRP)** in compliance with **NIST, STIG, FEDRAMP, and FISMA** standards. The tool supports multi-user access, version control, and exports plans to **Markdown, JSON, and PDF** formats.
 
-## Directory Structure
+## 🚀 Features
+- **Multi-user authentication** with roles: `admin`, `approver`, `editor`, `viewer`.
+- **Create, edit, and delete DRP/IRP plans** with version control.
+- **Rollback to previous versions** of a plan.
+- **Export plans to Markdown (`.md`), JSON (`.json`), and PDF (`.pdf`).**
+- **Full audit logging** to track actions.
+- **Fully automated CLI tool** built with `Typer`.
+- **Cross-platform support** (macOS, Windows, Linux).
 
+## 🛠 Installation
+
+### **1. Clone the Repository**
+```bash
+git clone https://github.com/YOUR_USERNAME/dr_ir_generation.git
+cd dr_ir_generation
+```
+
+### **2. Create a Virtual Environment (Recommended)**
+```bash
+python -m venv venv
+source venv/bin/activate  # macOS/Linux
+venv\Scripts\activate   # Windows
+```
+
+### **3. Install Dependencies**
+```bash
+pip install -r requirements.txt
+```
+
+### **4. Initialize the Database**
+```bash
+python main.py init
+```
+
+## 🔑 User Roles
+| Role      | Permissions |
+|-----------|------------|
+| Admin     | Can create, edit, delete plans, view logs, manage users |
+| Approver  | Can approve/reject plans |
+| Editor    | Can create, edit, and rollback plans |
+| Viewer    | Can only view plans |
+
+## 📌 Usage
+
+### **👤 Add Users**
+```bash
+python main.py add-user admin SecurePass123 --role admin
+python main.py add-user editor1 EditorPass123 --role editor
+python main.py add-user viewer1 ViewerPass123 --role viewer
+```
+
+### **🔑 Login**
+```bash
+python main.py login admin SecurePass123
+```
+
+### **📄 Create a New Plan**
+```bash
+python main.py create-plan-cli editor1 EditorPass123 "Business Continuity Plan" drp "Initial test content"
+```
+
+### **📝 Save a New Plan Version**
+```bash
+python main.py save-plan-version-cli editor1 EditorPass123 1 "Updated content for DRP"
+```
+
+### **📜 List All Plan Versions**
+```bash
+python main.py list-plan-versions-cli 1
+```
+
+### **🔄 Rollback to an Earlier Version**
+```bash
+python main.py rollback-plan-cli editor1 EditorPass123 1 1
+```
+
+### **📑 View Logs (Admin Only)**
+```bash
+python main.py view-logs admin SecurePass123
+```
+
+### **📤 Export Plans**
+- **Markdown:** `python main.py export-plan-markdown-cli 1`
+- **JSON:** `python main.py export-plan-json-cli 1`
+- **PDF:** `python main.py export-plan-pdf-cli 1`
+
+## 🏗 Project Structure
 ```
 .
 ├── LICENSE
 ├── README.md
-├── interactive_policy.sh
-├── outputs
-│   ├── drp
-│   │   └── drp_test1.md
-│   └── irp
-├── policy_generator.sh
-└── templates
+├── main.py
+├── requirements.txt
+├── test_script.sh
+├── db/
+│   ├── database_setup.py
+│   ├── models.py
+│   ├── query.py
+├── outputs/
+│   ├── drp/
+│   ├── irp/
+├── scripts/
+│   ├── auth.py
+└── templates/
     ├── drp_master_template.md
     └── irp_master_template.md
-
-5 directories, 7 files
 ```
 
-## Scripts Overview
-
-### 1. `interactive_policy.sh`
-An interactive script that guides users through creating and customizing DRP and IRP documents directly in the terminal.
-
-#### Features
-- **Interactive Data Entry**: Users are prompted to provide details for each section of the plan.
-- **Plan Management**:
-  - Create new plans.
-  - View and edit existing plans.
-  - Delete plans by name.
-- **User-Friendly Prompts**: Includes examples and help for each input field.
-- **Dynamic Output**: Saves progress to `outputs/drp` or `outputs/irp`.
-
-#### Usage
-1. Run the script: `./interactive_policy.sh`
-2. Choose to work on DRP or IRP.
-3. Follow prompts to create, view/edit, or delete plans.
-
----
-
-### 2. `policy_generator.sh`
-A batch script for generating DRP and IRP documents from master templates.
-
-#### Features
-- **Template-Based Generation**: Uses `templates/drp_master_template.md` and `templates/irp_master_template.md` as baselines.
-- **Batch Customization**: Automatically replaces placeholders in the templates with user-provided data.
-- **Plan Management**:
-  - Generate new plans.
-  - List existing plans.
-  - Delete plans by name.
-
-#### Usage
-1. Run the script: `./policy_generator.sh`
-2. Choose to generate or manage DRPs or IRPs.
-3. Follow the menu to create or delete plans.
-
----
-
-## Templates
-### DRP Template (`templates/drp_master_template.md`)
-- Comprehensive structure for disaster recovery planning.
-- Includes sections for:
-  - Purpose
-  - Objectives
-  - Scope
-  - Risk Assessment
-  - Recovery Strategies
-  - Testing and Maintenance
-  - Appendices
-
-### IRP Template (`templates/irp_master_template.md`)
-- Detailed framework for incident response management.
-- Covers:
-  - Incident Categories
-  - Incident Response Phases
-  - Communication Plan
-  - Testing and Maintenance
-  - Appendices
-
----
-
-## Outputs
-Generated plans are stored in the `outputs` directory:
-
-- **DRPs**: Saved in `outputs/drp`
-- **IRPs**: Saved in `outputs/irp`
-
----
-
-## Prerequisites
-- **Bash Shell**: Ensure you are using a system with Bash installed.
-- **Pandoc**: Required for converting Markdown to `.docx` (if extended functionality is added).
-
-Install Pandoc (if needed):
+## 📌 Requirements (`requirements.txt`)
+```
+typer
+sqlalchemy
+weasyprint
+markdown
+```
+*Ensure all dependencies are installed with:*
 ```bash
-brew install pandoc  # For macOS
-sudo apt install pandoc  # For Ubuntu/Debian
+pip install -r requirements.txt
+```
+
+## 📂 .gitignore (Ensure This is Included)
+```
+# Virtual Environment
+venv/
+
+# Database Files
+*.db
+
+# Compiled Python Files
+__pycache__/
+*.pyc
+
+# Outputs & Logs
+outputs/
+logs/
+```
+
+## 🚀 Running the Test Script
+To ensure everything is working correctly, run:
+```bash
+./test_script.sh
 ```
 
 ---
 
-## How to Contribute
-1. Fork the repository.
-2. Create a new branch: `git checkout -b feature-branch`
-3. Commit changes: `git commit -m 'Add new feature'`
-4. Push to the branch: `git push origin feature-branch`
-5. Open a pull request.
+## ✅ Next Steps
+- Expand the tool with a **web-based GUI**.
+- Add **AI-powered compliance recommendations**.
+- Integrate with **external security frameworks**.
 
----
-
-## License
-This project is licensed under the MIT License. See the `LICENSE` file for details.
-
----
-
-## Feedback and Support
-If you have any issues or suggestions, please open an issue in the repository or contact us directly.
+For any issues, open a GitHub issue. 🚀
