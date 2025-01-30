@@ -1,4 +1,7 @@
 import click
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), 'scripts'))
 from db.query import create_user, authenticate_user, check_permission, list_plans, delete_plan, save_plan_version, list_plan_versions, rollback_plan, view_logs, delete_user
 
 from db.database_setup import init_db

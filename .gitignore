@@ -9,6 +9,7 @@ venv/
 
 # Compiled Python Files
 __pycache__/
+db/__pycache__/
 *.pyc
 
 # Outputs & Logs
