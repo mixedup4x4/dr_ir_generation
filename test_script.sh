@@ -1,49 +1,49 @@
 #!/bin/bash
 
-echo "🚀 Running Automated DRP/IRP Test Script..."
-
-# Step 1: Reset the database
+# Reset the database
 echo "🔄 Resetting database..."
-rm -f dr_ir_generation.db
+rm dr_ir_generation.db
 python main.py init
 
-# Step 2: Create users
+# Add users
 echo "👤 Creating users..."
-python main.py add-user admin SecurePass123 --role admin
+python main.py add-user admin adminPass123 --role admin
 python main.py add-user editor1 EditorPass123 --role editor
+python main.py add-user viewer1 ViewerPass123 --role viewer
 
-# Step 3: Create a new DRP plan
+# Try creating DRP plan
 echo "📄 Creating a new DRP plan..."
-python main.py create-plan-cli editor1 EditorPass123 "Test DRP" drp "Initial test content"
+python main.py create-plan-cli editor1 EditorPass123 "Test DRP Plan" --plan-type drp --framework nist
 
-# Step 4: Save a new version
+# Try saving a new version
 echo "📝 Saving a new version..."
-python main.py save-plan-version-cli editor1 EditorPass123 1 "Updated content for DRP"
+python main.py create-plan-cli editor1 EditorPass123 "Test DRP Plan" --plan-type drp --framework nist
 
-# Step 5: List all versions
+# List all versions
 echo "📜 Listing all versions..."
-python main.py list-plan-versions-cli 1
+python main.py list-plans-cli
 
-# Step 6: Rollback to Version 1
-echo "🔄 Rolling back to version 1..."
-python main.py rollback-plan-cli editor1 EditorPass123 1 1
+# Try rolling back to the previous version
+echo "🔄 Rolling back to previous version..."
+python main.py rollback-plan-cli editor1 EditorPass123 1
 
-# Step 7: Export to Markdown
+# Export plan to Markdown, JSON, PDF
 echo "📝 Exporting to Markdown..."
 python main.py export-plan-markdown-cli 1
 
-# Step 8: Export to JSON
 echo "🔍 Exporting to JSON..."
 python main.py export-plan-json-cli 1
 
-# Step 9: Export to PDF
 echo "📄 Exporting to PDF..."
 python main.py export-plan-pdf-cli 1
 
-# Step 10: View logs
-echo "📑 Viewing logs..."
-python main.py view-logs admin SecurePass123
+# List all logs
+echo "📑 Listing all logs..."
+python main.py view-logs editor1 EditorPass123
+
+# Test user deletion
+echo "🗑️ Deleting users..."
+python main.py delete-user-cli editor1
+python main.py delete-user-cli viewer1
 
 echo "✅ Test Script Completed Successfully!"
-
-ls -l outputs/
