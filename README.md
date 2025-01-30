@@ -152,5 +152,7 @@ To ensure everything is working correctly, run:
 - Expand the tool with a **web-based GUI**.
 - Add **AI-powered compliance recommendations**.
 - Integrate with **external security frameworks**.
+- Update README
 
 For any issues, open a GitHub issue. 🚀
+
