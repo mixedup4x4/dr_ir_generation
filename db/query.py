@@ -1,25 +1,31 @@
 from db.database_setup import session
 from db.models import User, Plan, PlanVersion, Log  # Ensure User is imported
 from werkzeug.security import check_password_hash   # To securely compare passwords
+from scripts.utils import generate_hash, verify_password, format_datetime   #import functions
 
 def log_action(user_id, action):
     """Log an action performed by the user."""
     new_log = Log(user_id=user_id, action=action)
     session.add(new_log)
     session.commit()
-    print(f"Logged action: {action}")
-
+    print(f"Logged action: {action} at {format_datetime(new_log.timestamp)}")
 def view_logs(user):
     """Retrieve logs for the given user."""
     logs = session.query(Log).filter_by(user_id=user.id).all()
     return logs
 
+# In db/query.py
+from utils import verify_password  # Import the function
+
 def authenticate_user(username, password):
-    """Authenticate a user by checking the username and password."""
+    """Authenticate a user by verifying the password."""
     user = session.query(User).filter_by(username=username).first()
-    if user and check_password_hash(user.password_hash, password):
+    if user and verify_password(user.password_hash, password):  # Verify the password hash
+        print(f"User '{username}' authenticated successfully. Role: {user.role}")
         return user
-    return None
+    else:
+        print("Login failed. Invalid credentials.")
+        return None
 
 def check_permission(user, permission_level):
     """Check if the user has the required permission level."""
@@ -34,9 +40,8 @@ def check_permission(user, permission_level):
 from werkzeug.security import generate_password_hash
 
 def create_user(username, password, role):
-    """Create a new user with a specific role."""
-    # Hash the password before saving it to the database
-    hashed_password = generate_password_hash(password)
+    """Create a new user with a hashed password."""
+    hashed_password = generate_hash(password)  # Hash the password
     new_user = User(username=username, password_hash=hashed_password, role=role)
     session.add(new_user)
     session.commit()
