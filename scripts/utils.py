@@ -1,25 +1,3 @@
-<<<<<<< HEAD
-import hashlib
-from werkzeug.security import generate_password_hash, check_password_hash
-import os
-from datetime import datetime
-
-def generate_hash(password: str) -> str:
-    """Generate a hashed password."""
-    return generate_password_hash(password)
-
-def verify_password(stored_hash: str, password: str) -> bool:
-    """Verify a password against a stored hash."""
-    return check_password_hash(stored_hash, password)
-
-def generate_random_string(length: int = 16) -> str:
-    """Generate a random string for use in token generation or password creation."""
-    return os.urandom(length).hex()
-
-def format_datetime(datetime_obj) -> str:
-    """Return a formatted datetime string."""
-    return datetime_obj.strftime('%Y-%m-%d %H:%M:%S')
-=======
 import os
 import re
 import logging
@@ -32,6 +10,14 @@ from email.mime.multipart import MIMEMultipart
 import smtplib
 from werkzeug.security import generate_password_hash, check_password_hash
 
+# Password Hashing
+def generate_hash(password: str) -> str:
+    """Generate a hashed password."""
+    return generate_password_hash(password)
+
+def verify_password(stored_hash: str, password: str) -> bool:
+    """Verify a password against a stored hash."""
+    return check_password_hash(stored_hash, password)
 
 # File Handling Utilities
 def safe_write(file_path, content):
@@ -40,7 +26,7 @@ def safe_write(file_path, content):
         with open(file_path, 'w') as file:
             file.write(content)
     except Exception as e:
-        print(f"Error writing to {file_path}: {e}")
+        logging.error(f"Error writing to {file_path}: {e}")
 
 def backup_file(file_path):
     """Backup a file by appending a timestamp."""
@@ -48,28 +34,23 @@ def backup_file(file_path):
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         backup_path = f"{file_path}_{timestamp}.bak"
         shutil.copy(file_path, backup_path)
-        print(f"Backup created: {backup_path}")
+        logging.info(f"Backup created: {backup_path}")
     else:
-        print("File not found.")
+        logging.warning("File not found.")
 
 # String Manipulation
 def sanitize_string(input_string):
     """Sanitize a string by trimming whitespace and removing unwanted characters."""
     return input_string.strip().replace("\n", "").replace("\r", "")
 
-def generate_random_string(length=8):
-    """Generate a random alphanumeric string of the specified length."""
+def generate_random_string(length=16):
+    """Generate a random alphanumeric string."""
     return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
 
 # Date and Time Helpers
-def convert_date_format(date_str, current_format, target_format):
-    """Convert date string from one format to another."""
-    try:
-        date_obj = datetime.strptime(date_str, current_format)
-        return date_obj.strftime(target_format)
-    except ValueError:
-        print(f"Error: {date_str} doesn't match the format {current_format}")
-        return None
+def format_datetime(datetime_obj) -> str:
+    """Return a formatted datetime string."""
+    return datetime_obj.strftime('%Y-%m-%d %H:%M:%S')
 
 def get_current_timestamp():
     """Return the current timestamp in a standardized format."""
@@ -79,20 +60,12 @@ def get_current_timestamp():
 def validate_email(email):
     """Check if the provided email address is valid."""
     pattern = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
-    if re.match(pattern, email):
-        return True
-    else:
-        print("Invalid email format.")
-        return False
+    return bool(re.match(pattern, email))
 
 def validate_url(url):
     """Validate if the provided string is a proper URL."""
     pattern = r'https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+'
-    if re.match(pattern, url):
-        return True
-    else:
-        print("Invalid URL format.")
-        return False
+    return bool(re.match(pattern, url))
 
 # Logging Helper
 def setup_logging(log_file="app.log"):
@@ -104,25 +77,13 @@ def setup_logging(log_file="app.log"):
 
 def log_message(message, level="INFO"):
     """Log a custom message at the specified level."""
-    if level == "INFO":
-        logging.info(message)
-    elif level == "ERROR":
-        logging.error(message)
-    elif level == "WARNING":
-        logging.warning(message)
-    elif level == "DEBUG":
-        logging.debug(message)
-    else:
-        logging.info(message)
-
-# Password Hashing
-def hash_password(password):
-    """Generate a hash of the given password."""
-    return generate_password_hash(password)
-
-def verify_password(username, password, stored_hash):
-    """Verify a password against a stored hash."""
-    return check_password_hash(stored_hash, password)
+    levels = {
+        "INFO": logging.info,
+        "ERROR": logging.error,
+        "WARNING": logging.warning,
+        "DEBUG": logging.debug
+    }
+    levels.get(level.upper(), logging.info)(message)
 
 # Database Helpers
 from db.database_setup import session
@@ -162,15 +123,15 @@ def send_email(to_address, subject, body, from_address="noreply@example.com"):
 
         # Establish SMTP connection
         with smtplib.SMTP('smtp.example.com', 587) as server:
-            server.starttls()  # Secure the connection
+            server.starttls()
             server.login(from_address, "your_email_password")
             text = msg.as_string()
             server.sendmail(from_address, to_address, text)
-            print("Email sent successfully.")
+            logging.info("Email sent successfully.")
     except Exception as e:
-        print(f"Failed to send email: {e}")
+        logging.error(f"Failed to send email: {e}")
 
-# Session management (for DB-related operations)
+# Plan Management
 def get_plan_by_id(plan_id):
     """Retrieve plan by ID."""
     return session.query(Plan).filter(Plan.id == plan_id).first()
@@ -181,7 +142,6 @@ def delete_plan_by_id(plan_id):
     if plan:
         session.delete(plan)
         session.commit()
-        print(f"Plan {plan_id} deleted.")
+        logging.info(f"Plan {plan_id} deleted.")
     else:
-        print(f"Plan with ID {plan_id} not found.")
->>>>>>> enhancements
+        logging.warning(f"Plan with ID {plan_id} not found.")

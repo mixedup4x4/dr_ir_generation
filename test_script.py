@@ -26,15 +26,12 @@ def clear_existing_data():
     """ Clear any existing users and plans to avoid conflicts """
     logging.info("Clearing existing users and plans...")
     try:
-        # List of users to clear
         usernames = ['editor1', 'editor2', 'viewer1']
-        
-        # Ensure session is properly created and check the connection
+
         if not session:
             logging.error("Session is not properly initialized.")
             return
 
-        # Delete users (ensure not deleting admin if needed)
         for username in usernames:
             logging.info(f"Looking for user: {username}")
             user = session.query(User).filter_by(username=username).first()
@@ -44,15 +41,12 @@ def clear_existing_data():
             else:
                 logging.warning(f"User '{username}' not found, skipping deletion.")
 
-        # Delete plans if needed
-        plans = list_plans()
-        if plans:
-            for plan in plans:
-                delete_plan(plan.id)
-            logging.info("Existing plans cleared successfully.")
-        else:
-            logging.warning("No plans found to delete.")
-        
+        plans = list_plans() or []  # Ensure it's always iterable
+        for plan in plans:
+            if plan:  # Ensure plan is not None
+               delete_plan(plan.id)
+        logging.info("Existing plans cleared successfully.")
+
         logging.info("Existing data cleared successfully.")
     except Exception as e:
         logging.error(f"Failed to clear existing data: {e}")
@@ -60,28 +54,26 @@ def clear_existing_data():
 def test_user_creation():
     """ Test user creation and authentication """
     try:
-        # Check if users exist before creating them
-        if not authenticate_user('editor1', 'EditorPass123'):
-            create_user('editor1', 'EditorPass123', 'editor')
-        if not authenticate_user('editor2', 'EditorPass123'):
-            create_user('editor2', 'EditorPass123', 'editor')
-        if not authenticate_user('viewer1', 'ViewerPass123'):
-            create_user('viewer1', 'ViewerPass123', 'viewer')
+        users = [
+            ("editor1", "EditorPass123", "editor"),
+            ("editor2", "EditorPass123", "editor"),
+            ("viewer1", "ViewerPass123", "viewer")
+        ]
 
-        # Verifying that password hashing works correctly
+        for username, password, role in users:
+            if not authenticate_user(username, password):
+                create_user(username, password, role)
+                logging.info(f"User '{username}' created successfully with role '{role}'.")
+
         logging.info("Verifying password hashing for users...")
-        editor1 = session.query(User).filter_by(username='editor1').first()
-        if verify_password('editor1', 'EditorPass123', editor1.password_hash):
-            logging.info("Editor1 authenticated successfully.")
-        else:
-            logging.error("Editor1 authentication failed.")
-        
-        viewer1 = session.query(User).filter_by(username='viewer1').first()
-        if verify_password('viewer1', 'ViewerPass123', viewer1.password_hash):
-            logging.info("Viewer1 authenticated successfully.")
-        else:
-            logging.error("Viewer1 authentication failed.")
-        
+
+        for username, password, _ in users:
+            user = session.query(User).filter_by(username=username).first()
+            if user and verify_password(user.password_hash, password):
+                logging.info(f"{username.capitalize()} authenticated successfully.")
+            else:
+                logging.error(f"{username.capitalize()} authentication failed.")
+
     except Exception as e:
         logging.error(f"Error in user creation or verification: {e}")
         sys.exit(1)
@@ -89,7 +81,6 @@ def test_user_creation():
 def test_plan_creation():
     """ Test the plan creation functionality """
     try:
-        # Create DRP Plan
         logging.info("Creating DRP plan...")
         create_plan('Test DRP', 'drp', 'editor1', 'nist')
         logging.info("Plan 'Test DRP' created successfully.")
