@@ -23,3 +23,9 @@ __pycache__/
 .pytest_cache/
 .coverage
 htmlcov/
+
+# Ignore backups
+# Ignore backups and tar files
+*.tar.gz
+*.zip
+*.bak
