@@ -5,13 +5,16 @@ cffi==1.17.1
 click==8.1.8
 cssselect2==0.7.0
 fonttools==4.55.8
+iniconfig==2.0.0
 Markdown==3.7
 markdown-it-py==3.0.0
 MarkupSafe==3.0.2
 mdurl==0.1.2
+packaging==24.2
 pandoc==2.4
 pdfkit==1.0.0
 pillow==11.1.0
+pluggy==1.5.0
 plumbum==1.9.0
 ply==3.11
 pycparser==2.22
@@ -20,6 +23,8 @@ pydantic_core==2.27.2
 pydyf==0.11.0
 Pygments==2.19.1
 pyphen==0.17.2
+pytest==8.3.4
+pytest-mock==3.14.0
 python-dotenv==1.0.1
 rich==13.9.4
 shellingham==1.5.4
