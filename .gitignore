@@ -16,3 +16,10 @@ db/__pycache__/
 outputs/
 logs/
 
+# Ignore pytest cache and coverage reports
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.coverage
+htmlcov/
