@@ -1,16 +1,18 @@
 # DR/IR Plan Generator
 
 ## 📌 Overview
-This project automates the generation, management, and versioning of **Disaster Recovery Plans (DRP)** and **Incident Response Plans (IRP)** in compliance with **NIST, STIG, FEDRAMP, and FISMA** standards. The tool supports multi-user access, version control, and exports plans to **Markdown, JSON, and PDF** formats.
+This project automates the generation, management, and versioning of **Disaster Recovery Plans (DRP)** and **Incident Response Plans (IRP)** in compliance with **NIST, STIG, FEDRAMP, and FISMA** standards. The tool supports **multi-user authentication, version control, audit logging, and exporting to multiple formats**.
 
 ## 🚀 Features
 - **Multi-user authentication** with roles: `admin`, `approver`, `editor`, `viewer`.
-- **Create, edit, and delete DRP/IRP plans** with version control.
-- **Rollback to previous versions** of a plan.
+- **Plan versioning** with rollback support.
+- **Audit logging** to track all actions.
 - **Export plans to Markdown (`.md`), JSON (`.json`), and PDF (`.pdf`).**
-- **Full audit logging** to track actions.
-- **Fully automated CLI tool** built with `Typer`.
+- **Fully automated CLI tool** using `Typer`.
 - **Cross-platform support** (macOS, Windows, Linux).
+- **Comprehensive test suite** using `pytest`.
+
+---
 
 ## 🛠 Installation
 
@@ -37,13 +39,17 @@ pip install -r requirements.txt
 python main.py init
 ```
 
+---
+
 ## 🔑 User Roles
 | Role      | Permissions |
 |-----------|------------|
-| Admin     | Can create, edit, delete plans, view logs, manage users |
-| Approver  | Can approve/reject plans |
-| Editor    | Can create, edit, and rollback plans |
-| Viewer    | Can only view plans |
+| Admin     | Manage users, plans, and logs |
+| Approver  | Approve/reject plans |
+| Editor    | Create, edit, and rollback plans |
+| Viewer    | View plans only |
+
+---
 
 ## 📌 Usage
 
@@ -89,6 +95,8 @@ python main.py view-logs admin SecurePass123
 - **JSON:** `python main.py export-plan-json-cli 1`
 - **PDF:** `python main.py export-plan-pdf-cli 1`
 
+---
+
 ## 🏗 Project Structure
 ```
 .
@@ -96,7 +104,6 @@ python main.py view-logs admin SecurePass123
 ├── README.md
 ├── main.py
 ├── requirements.txt
-├── test_script.sh
 ├── db/
 │   ├── database_setup.py
 │   ├── models.py
@@ -106,22 +113,32 @@ python main.py view-logs admin SecurePass123
 │   ├── irp/
 ├── scripts/
 │   ├── auth.py
-└── templates/
-    ├── drp_master_template.md
-    └── irp_master_template.md
+├── templates/
+│   ├── drp_master_template.md
+│   └── irp_master_template.md
+├── tests/
+│   ├── test_users.py
+│   ├── test_plans.py
+│   ├── test_logs.py
 ```
 
-## 📌 Requirements (`requirements.txt`)
-```
-typer
-sqlalchemy
-weasyprint
-markdown
-```
-*Ensure all dependencies are installed with:*
+---
+
+## ✅ Running Tests (Pytest)
+
+This project now uses `pytest` for testing. To run all test cases:
 ```bash
-pip install -r requirements.txt
+pytest tests/
 ```
+
+Run specific test files:
+```bash
+pytest tests/test_users.py  # Run user-related tests
+pytest tests/test_plans.py  # Run plan-related tests
+pytest tests/test_logs.py   # Run log-related tests
+```
+
+---
 
 ## 📂 .gitignore (Ensure This is Included)
 ```
@@ -140,19 +157,15 @@ outputs/
 logs/
 ```
 
-## 🚀 Running the Test Script
-To ensure everything is working correctly, run:
-```bash
-./test_script.sh
-```
+---
+
+## 🚀 Next Steps
+- Optimize code for better efficiency and error handling.
+- Expand test coverage and remove redundant test scripts.
+- Potentially integrate a **web-based GUI**.
+- Explore **AI-powered compliance recommendations**.
+- Enhance documentation further after refactoring.
 
 ---
 
-## ✅ Next Steps
-- Expand the tool with a **web-based GUI**.
-- Add **AI-powered compliance recommendations**.
-- Integrate with **external security frameworks**.
-- Update README
-
 For any issues, open a GitHub issue. 🚀
-
